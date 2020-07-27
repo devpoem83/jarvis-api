@@ -1,0 +1,10 @@
+traking:
+    visit: >
+        exec USPW_MYROOM_SetPageVisitLog
+            @user_id = #{userId}
+            ,@page_url = #{pageUrl}
+            ,@referer_url = #{refererUrl}
+            ,@auth_cookie = #{authCookie}
+            ,@user_ip = #{userIp}
+            ,@server_ip = #{serverIp}
+            ,@agent = #{agent}

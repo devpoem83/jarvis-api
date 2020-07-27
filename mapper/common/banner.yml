@@ -1,0 +1,30 @@
+#Banner
+#배너
+banner:
+    #배너 목록 조회
+    list: >
+        declare @P_USER_ID varchar(20) = #{userId}
+            ,@P_BNR_NO int = #{bnrNo}
+            ,@P_PROGRESS_CD varchar(4) = #{progressCd}
+
+        select   a.BNR_NO, a.BNR_NM
+            ,a.WEB_IMG_URL, a.MOBILE_IMG_URL
+            ,a.WEB_LINK_URL, a.MOBILE_LINK_URL
+            ,a.LINK_TYPE_CD
+            ,a.BNR_KIND_CD
+            ,a.BNR_TYPE_CD
+            ,a.BNR_TARGET_CD
+            ,b.PROGRESS_CD
+            ,b.SORT
+        from services_banner As a with(nolock)
+        inner join SERVICES_BANNER_PROGRESS As b with(nolock) on (b.BNR_NO = a.BNR_NO)
+        where 1=1
+        and a.BNR_NO = @P_BNR_NO
+        and case when @P_PROGRESS_CD = '' then '' else b.PROGRESS_CD end = @P_PROGRESS_CD
+        and a.USE_YN = 'Y'
+        and a.EXPSR_START_DT <= getdate()
+        and a.EXPSR_END_DT >= getdate()
+        and a.BNR_TYPE_CD = 'D'
+        and a.BNR_TARGET_CD = 0
+        order by b.SORT
+        

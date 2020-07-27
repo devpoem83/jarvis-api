@@ -1,0 +1,19 @@
+#Alarm
+#알림
+alarm:
+    #카운트 조회
+    count: >
+        USPW_ComNotice_GetCount #{userId}, #{type}
+    
+    #목록 조회
+    list: >
+        USPW_ComNotice_GetList #{userId}, #{page}, #{pageSize}, #{searchTitle}, #{searchCont}
+    
+    
+    #수신확인
+    confirm: >
+        USPW_ComNotice_InsertRecv #{userId}, #{noticeIdx}, #{recvTypeCd}
+    
+    #삭제
+    delete: >
+        USPW_ComNotice_DeleteRecv #{userId}, #{delType}, #{noticeIdx}

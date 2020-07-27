@@ -1,0 +1,8 @@
+eco:
+    template: >
+        declare @P_ITEM_ID int = #{itemId}
+        select top 1 a.template, replace(replace((rtrim(ltrim(b.title))), ' ', '_'), ',', '_') as title
+        from eco_contents_item As a with(nolock)
+             inner join eco_contents As b with(nolock) on (b.content_id = a.content_id)
+        where 1=1
+        and a.item_id = @P_ITEM_ID

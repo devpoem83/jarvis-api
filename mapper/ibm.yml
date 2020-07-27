@@ -1,0 +1,145 @@
+ibm:
+    services: >
+        declare @P_SVC_CD varchar(max) = #{svcCd}
+
+        select a.SVC_CD as svcCd
+                ,a.SVC_NM as svcNm
+                ,a.TOTAL_CTGRY_NM as totalCtgryNm
+        from IBM_SERVICE As a with(nolock)
+        where 1=1
+        and a.DEL_YN = 'N'
+        and a.SVC_CD in (
+            select value
+            from fn_Split(@P_SVC_CD, ',')
+        )
+
+    banner: >
+        declare @P_SVC_CD varchar(50) = #{svcCd}
+        select top 1 b.BNR_NO as bnrNo
+                ,b.BNR_NM as bnrNm
+                ,b.EXPSR_DEVC as expsrDevc
+                ,b.DIM_USE_YN as dimUseYn
+                ,b.END_TYPE as endType
+                ,b.LIST_EXPSR_TYPE as listExpsrType
+                ,b.LIST_PAGE_USE_YN as listPageUseYn
+                ,b.LIST_FRONT_REAR_USE_YN as listFrontRearUseYn
+                ,b.EXPSR_LOC as expsrLoc
+                ,b.UPRND_LOC_ADJST as uprndLocAdjst
+                ,b.LEFT_LOC_ADJST as leftLocAdjst
+                ,b.CALBAK_USE_YN as calbakUseYn
+                ,b.TMPLT_NO as tmpltNo
+        from IBM_SERVICE_BANNER As a with(nolock)
+            inner join IBM_BANNER As b with(nolock) on (b.BNR_NO = a.BNR_NO)
+        where 1=1 
+        and a.SVC_CD = @P_SVC_CD
+        and b.EXPSR_START_DT <= getdate()
+        and b.EXPSR_END_DT >= getdate()
+        and b.EXPSR_YN = 'Y'
+        and b.DEL_YN <> 'Y'
+        order by a.REG_DT desc
+
+    just-banner: >
+        declare @P_BNR_NO int = #{bnrNo}
+        select top 1 b.BNR_NO as bnrNo
+                ,b.BNR_NM as bnrNm
+                ,b.EXPSR_DEVC as expsrDevc
+                ,b.DIM_USE_YN as dimUseYn
+                ,b.END_TYPE as endType
+                ,b.LIST_EXPSR_TYPE as listExpsrType
+                ,b.LIST_PAGE_USE_YN as listPageUseYn
+                ,b.LIST_FRONT_REAR_USE_YN as listFrontRearUseYn
+                ,b.EXPSR_LOC as expsrLoc
+                ,b.UPRND_LOC_ADJST as uprndLocAdjst
+                ,b.LEFT_LOC_ADJST as leftLocAdjst
+                ,b.CALBAK_USE_YN as calbakUseYn
+                ,b.TMPLT_NO as tmpltNo
+        from IBM_BANNER As b with(nolock)
+        where 1=1 
+        and b.DEL_YN <> 'Y'
+        and b.BNR_NO = @P_BNR_NO
+
+    preview-banner: >
+        declare @P_SVC_CD varchar(50) = #{svcCd}
+                ,@P_BNR_NO int = #{bnrNo}
+
+        select top 1 b.BNR_NO as bnrNo
+                ,b.BNR_NM as bnrNm
+                ,b.EXPSR_DEVC as expsrDevc
+                ,b.DIM_USE_YN as dimUseYn
+                ,b.END_TYPE as endType
+                ,b.LIST_EXPSR_TYPE as listExpsrType
+                ,b.LIST_PAGE_USE_YN as listPageUseYn
+                ,b.LIST_FRONT_REAR_USE_YN as listFrontRearUseYn
+                ,b.EXPSR_LOC as expsrLoc
+                ,b.UPRND_LOC_ADJST as uprndLocAdjst
+                ,b.LEFT_LOC_ADJST as leftLocAdjst
+                ,b.CALBAK_USE_YN as calbakUseYn
+        from IBM_SERVICE_BANNER As a with(nolock)
+            inner join IBM_BANNER As b with(nolock) on (b.BNR_NO = a.BNR_NO)
+        where 1=1 
+        and a.SVC_CD = @P_SVC_CD
+        and b.BNR_NO = @P_BNR_NO
+
+    contents: >
+        declare @P_BNR_NO int = #{bnrNo}
+        select a.CONTNT_NO as contntNo
+                ,a.CONTNT_TYPE as contntType
+                ,a.PC_IMG_URL as pcImgUrl
+                ,a.OVER_IMG_URL as overImgUrl
+                ,a.MOBILE_IMG_URL as mobileImgUrl
+                ,a.OVER_IMG_USE_YN as overImgUseYn
+                ,a.LEFT_COLOR_CD as leftColorCd
+                ,a.RIGHT_COLOR_CD as rightColorCd
+                ,a.CALBAK as calbak
+                ,a.VOD_URL as vodUrl
+                ,a.CALBAK as calbak
+                ,case when len(a.PC_IMG_SIZE) > 0 then left(a.PC_IMG_SIZE, charindex('X', a.PC_IMG_SIZE) -1) else left(a.MOBILE_IMG_SIZE, charindex('X', a.MOBILE_IMG_SIZE) -1) end as width
+        from IBM_BANNER_CONTENT As a with(nolock) 
+        where 1=1 
+        and a.BNR_NO = @P_BNR_NO 
+        and a.DEL_YN = 'N'
+        order by a.SORT_ODER ASC
+
+    links: >
+        declare @P_CONTNT_NO int = #{contntNo}
+
+        select   a.LINK_NO as linkNo
+                ,a.LINK_TYPE as linkType
+                ,a.LINK_URL as linkUrl
+                ,a.LINK_MSG as linkMsg
+        from IBM_BANNER_CONTENT_LINK As a with(nolock)
+        where 1=1
+        and a.CONTNT_NO = @P_CONTNT_NO
+
+    banner-click: >
+        declare  @P_SVC_CD varchar(50) = #{svcCd}
+                ,@P_BNR_NO int = #{bnrNo}
+
+        update IBM_SERVICE
+        set CLICK_CNT = CLICK_CNT + 1
+        where SVC_CD = @P_SVC_CD
+
+        update IBM_BANNER
+        set CLICK_CNT = CLICK_CNT + 1
+        where BNR_NO = @P_BNR_NO
+
+        select @@ROWCOUNT as result
+
+    banner-display: >
+        declare  @P_SVC_CD varchar(300) = #{svcCds}
+                ,@P_BNR_NO varchar(300) = #{bnrNos}
+
+        update IBM_SERVICE
+        set EXPSR_CNT = EXPSR_CNT + 1
+        where SVC_CD in (
+            select value
+            from fn_Split(@P_SVC_CD, ',')
+        )
+
+        update IBM_BANNER
+        set EXPSR_CNT = EXPSR_CNT + 1
+        where 1=1
+        and BNR_NO in (
+            select value
+            from fn_Split(@P_BNR_NO, ',')
+        )

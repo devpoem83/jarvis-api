@@ -1,0 +1,25 @@
+server:
+    host: localhost
+    domain: s-jarvis-api.eduwill.net
+    port: 8080
+datasource:
+  ganagosi:
+    server: 172.16.20.30
+    name: ganagosi_net2
+    user: ganagosi_net
+    password: '!dnlf100djr'
+    options:
+      port: 15000
+      readOnlyIntent: false
+      encrypt: false
+  log:
+    server: 172.16.20.30
+    name: EDULOG
+    user: LogUser
+    password: 'dakrph#j38'
+    options:
+      port: 15000
+      readOnlyIntent: false
+      encrypt: false
+logger:
+  level: debug
